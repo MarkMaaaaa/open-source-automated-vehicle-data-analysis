@@ -25,6 +25,9 @@ y_fol = data(7:end,14+7*i0);
 d_fol= sqrt(x_fol.^2+y_fol.^2);
 d_pre= sqrt(x_pre.^2+y_pre.^2);
 dis = d_pre - d_fol;
+gap = data(7:end,42+i0);
+
+
 v_diff = v_pre(1:end-1)-v_fol(1:end-1);
 a_fol = diff(v_fol)*10;
 
@@ -32,20 +35,22 @@ num=50;
 Td=1.4;d_safe=1;
 num_P=4;
 
-X=[ones(22634,1),dis(1:end-1), v_fol(1:end-1), v_diff(1:end)];
+X=[ones(22634,1),gap(1:end-1), v_fol(1:end-1), v_diff(1:end)];
 [b1,bint1,r1,rint1,stats1] = regress(a_fol(1:end),X);
 
-d_new_a = d_fol(1);
+d_new_a = 0;
 v_new_a = v_fol(1);
 D_new_a = [];
 V_new_a = [];
 A_new_a = [];
+gap_new_a = gap(1);
 
 for time_i = 1:22634
-    a_new_a = b1(1) + b1(2)*(d_pre(time_i)-d_new_a) + b1(3)*v_new_a + b1(4)*(v_pre(time_i) - v_new_a);
+    a_new_a = b1(1) + b1(2)*(gap_new_a) + b1(3)*v_new_a + b1(4)*(v_pre(time_i) - v_new_a);
+    gap_new_a = gap_new_a + (v_fol(time_i) - (v_new_a + 0.05*a_new_a)) * 0.1;
     v_new_a = v_new_a + a_new_a*0.1;
-    d_new_a = d_new_a + v_new_a*0.1;
-    D_new_a = [D_new_a;d_new_a];
+%     d_new_a = d_new_a + v_new_a*0.1 + 0.5*a_new_a*0.01; 
+    D_new_a = [D_new_a;gap_new_a];
     V_new_a = [V_new_a;v_new_a];
     A_new_a = [A_new_a;a_new_a];
     
@@ -53,8 +58,28 @@ end
 
 plot(1:22634,V_new_a,1:22634,v_fol(1:end-1));
 legend('simu','real');
-xlabel('time(0.1 sec)')
-ylabel('velocity(m/s)')
+xlabel('time(0.1 sec)');
+ylabel('velocity(m/s)');
+
+plot(1:22634,D_new_a,1:22634,gap(1:end-1));
+legend('simu','real');
+xlabel('time(0.1 sec)');
+ylabel('Gap(m)');
+
+gap(2)-gap(1)
+gap(3)-gap(2)
+gap(4)-gap(3)
+
+v_pre(1)-v_fol(1)
+v_pre(2)-v_fol(2)
+v_pre(3)-v_fol(3)
+
+
+
+
+
+
+
 
 
 
@@ -62,7 +87,7 @@ ylabel('velocity(m/s)')
 b=cell(num_P,1,num);bint=cell(num_P,2,num);r=cell(1482,1,num);rint=cell(1482,2,num);stats=cell(1,4,num);
 for i=1:num %delay步长
 %     X=[ones(22635-i,1),dis(1:end-i), v_fol(1:end-i)];
-    X=[ones(22635-i,1),dis(1:end-i), v_fol(1:end-i), v_diff(1:end+1-i)];
+    X=[ones(22635-i,1),gap(1:end-i), v_fol(1:end-i), v_diff(1:end+1-i)];
     [b1,bint1,r1,rint1,stats1] = regress(a_fol(i:end),X);
     b(:,:,i)=num2cell(b1);
     bint(:,:,i)=num2cell(bint1);
@@ -79,10 +104,38 @@ end
 [max_val, max_idx] = max(stats_a);
 x=0.1:0.1:num/10;
 
+para_1_delay = cell2mat(b(1,:,max_idx));
+para_2_delay = cell2mat(b(2,:,max_idx));
+para_3_delay = cell2mat(b(3,:,max_idx));
+para_4_delay = cell2mat(b(4,:,max_idx));
 
+d_new_a = 0;
+v_new_a = v_fol(1);
+D_new_a = [];
+V_new_a = [];
+A_new_a = [];
+gap_new_a = gap(1);
 
+for time_i = 1:22634
+    a_new_a = para_1_delay + para_2_delay*(gap_new_a) + para_3_delay*v_new_a + para_4_delay*(v_pre(time_i) - v_new_a);
+    gap_new_a = gap_new_a + (v_fol(time_i) - (v_new_a + 0.05*a_new_a)) * 0.1;
+    v_new_a = v_new_a + a_new_a*0.1;
+%     d_new_a = d_new_a + v_new_a*0.1 + 0.5*a_new_a*0.01; 
+    D_new_a = [D_new_a;gap_new_a];
+    V_new_a = [V_new_a;v_new_a];
+    A_new_a = [A_new_a;a_new_a];
+    
+end
 
+plot(1:22634,V_new_a,1:22634,v_fol(1:end-1));
+legend('simu','real');
+xlabel('time(0.1 sec)');
+ylabel('velocity(m/s)');
 
+plot(1:22634,D_new_a,1:22634,gap(1:end-1));
+legend('simu','real');
+xlabel('time(0.1 sec)');
+ylabel('Gap(m)');
 
 
 
