@@ -35,10 +35,13 @@ num=50;
 Td=1.4;d_safe=1;
 num_P=4;
 
-X=[ones(22634,1),gap(1:end-1), v_fol(1:end-1), v_diff(1:end)];
+
+
+
 [b1,bint1,r1,rint1,stats1] = regress(a_fol(1:end),X);
 
-d_new_a = 0;
+
+% d_new_a = 0;
 v_new_a = v_fol(1);
 D_new_a = [];
 V_new_a = [];
