@@ -4,7 +4,7 @@ str = ['D:\Project\data\ASta_050719_platoon2.csv'];
 data = xlsread(str);
 % 1.time 2.speed1 3.lat1 4.lon1 
 % 9.speed2 10.lat2 11.lon2
-for i0=1:3
+for i0=0:3
 TIme = data(7:end,1);
 v_pre = data(7:end,2+7*i0);
 v_fol = data(7:end,9+7*i0);
@@ -37,7 +37,7 @@ num_P=4;
 
 
 
-
+X = []
 [b1,bint1,r1,rint1,stats1] = regress(a_fol(1:end),X);
 
 
@@ -69,13 +69,33 @@ legend('simu','real');
 xlabel('time(0.1 sec)');
 ylabel('Gap(m)');
 
-gap(2)-gap(1)
-gap(3)-gap(2)
-gap(4)-gap(3)
 
-v_pre(1)-v_fol(1)
-v_pre(2)-v_fol(2)
-v_pre(3)-v_fol(3)
+D_new_I = [];
+V_new_I = [];
+A_new_I = [];
+
+for i_IDM = 6:520
+    leader_speed = num(i_IDM,4)*0.3048;
+    lead_pos = num(i_IDM,2)*0.3048;
+    gap = lead_pos - follower_pos;
+    acceleration = IDM(leader_speed, follower_speed, gap, params);
+    follower_pos = follower_pos + follower_speed*0.1 + 0.5*acceleration*0.01;
+    follower_speed = follower_speed + acceleration*0.1;
+    
+    D_new_I = [D_new_I;follower_pos];
+    V_new_I = [V_new_I;follower_speed];
+    A_new_I = [A_new_I;acceleration];
+end
+
+
+
+% gap(2)-gap(1)
+% gap(3)-gap(2)
+% gap(4)-gap(3)
+% 
+% v_pre(1)-v_fol(1)
+% v_pre(2)-v_fol(2)
+% v_pre(3)-v_fol(3)
 
 
 
