@@ -1,5 +1,10 @@
 clear;
 clc;
+
+m2ft = 3.28084;
+ft2m = 1/m2ft;
+
+
 str = ['D:\Project\data\ASta_050719_platoon2.csv'];
 data = xlsread(str);
 % 1.time 2.speed1 3.lat1 4.lon1 
@@ -37,7 +42,7 @@ num_P=4;
 
 
 
-X = []
+X=[ones(22634,1),gap(1:end-1), v_fol(1:end-1), v_diff(1:end)];
 [b1,bint1,r1,rint1,stats1] = regress(a_fol(1:end),X);
 
 
@@ -59,35 +64,54 @@ for time_i = 1:22634
     
 end
 
-plot(1:22634,V_new_a,1:22634,v_fol(1:end-1));
-legend('simu','real');
-xlabel('time(0.1 sec)');
-ylabel('velocity(m/s)');
+plot(0.1:0.1:2263.4,V_new_a*m2ft,0.1:0.1:2263.4,v_fol(1:end-1)*m2ft);
+legend('Simu-SV','Real-SV');
+xlabel('Time(sec)');
+ylabel('Velocity(ft/sec)');
 
-plot(1:22634,D_new_a,1:22634,gap(1:end-1));
-legend('simu','real');
-xlabel('time(0.1 sec)');
-ylabel('Gap(m)');
+path_1=['C:\Users\Ke\Box\Project\AMS\Figure\lin-model-sv-velocity.fig'];
+path_2=['C:\Users\Ke\Box\Project\AMS\Figure\lin-model-sv-velocity.pdf'];
+saveas(gcf,path_1);
+saveas(gcf,path_2);
+rsquare(v_fol(1:end-1),V_new_a);
+rsquare(a_fol,A_new_a);
+
+% plot(1:22634,D_new_a,1:22634,gap(1:end-1));
+% legend('simu','real');
+% xlabel('time(0.1 sec)');
+% ylabel('Gap(m)');
 
 
 D_new_I = [];
 V_new_I = [];
 A_new_I = [];
-
-for i_IDM = 6:520
-    leader_speed = num(i_IDM,4)*0.3048;
-    lead_pos = num(i_IDM,2)*0.3048;
-    gap = lead_pos - follower_pos;
-    acceleration = IDM(leader_speed, follower_speed, gap, params);
-    follower_pos = follower_pos + follower_speed*0.1 + 0.5*acceleration*0.01;
+params = [1.5226023586787998, 3.0, 0.8723620611448215, 4.004726843181485, 2.172021336082908, 47.66047393864299];
+follower_speed = v_fol(1);
+gap_new_I = gap(1);
+for time_i = 1:22634
+    lead_speed = v_pre(time_i);
+%     lead_pos = num(i_IDM,2)*0.3048;
+%     gap = lead_pos - follower_pos;
+    acceleration = IDM(lead_speed, follower_speed, gap_new_I, params);
+    gap_new_I = gap_new_I + (v_pre(time_i) - (follower_speed + 0.5*acceleration))*0.1;
     follower_speed = follower_speed + acceleration*0.1;
     
-    D_new_I = [D_new_I;follower_pos];
+    D_new_I = [D_new_I;gap_new_I];
     V_new_I = [V_new_I;follower_speed];
     A_new_I = [A_new_I;acceleration];
 end
+rsquare(v_fol(1:end-1),V_new_I);
+rsquare(a_fol,A_new_I);
 
+plot(0.1:0.1:2263.4,V_new_I*m2ft,0.1:0.1:2263.4,v_fol(1:end-1)*m2ft);
+legend('Simu-SV','Real-SV');
+xlabel('Time(sec)');
+ylabel('Velocity(ft/sec)');
 
+path_1=['C:\Users\Ke\Box\Project\AMS\Figure\IDM-model-sv-velocity.fig'];
+path_2=['C:\Users\Ke\Box\Project\AMS\Figure\IDM-model-sv-velocity.pdf'];
+saveas(gcf,path_1);
+saveas(gcf,path_2);
 
 % gap(2)-gap(1)
 % gap(3)-gap(2)
