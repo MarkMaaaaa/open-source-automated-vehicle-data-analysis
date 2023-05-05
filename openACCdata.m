@@ -75,8 +75,8 @@ legend('Real-SV','Simu-SV','Simu2-SV','Simu3-SV');
 xlabel('Time(sec)');
 ylabel('Velocity(ft/sec)');
 
-path_1=['C:\Users\Ke\Box\Project\AMS\Figure\models-sv-velocity.fig'];
-path_2=['C:\Users\Ke\Box\Project\AMS\Figure\models-sv-velocity.pdf'];
+path_1=['C:\Users\Ke\Box\Project\AMS\Figure\thr-models.fig'];
+path_2=['C:\Users\Ke\Box\Project\AMS\Figure\thr-models.pdf'];
 saveas(gcf,path_1);
 saveas(gcf,path_2);
 rsquare(v_fol(1:end-1),V_new_a);
