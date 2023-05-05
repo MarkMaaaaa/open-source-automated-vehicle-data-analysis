@@ -45,6 +45,11 @@ num_P=4;
 X=[ones(22634,1),gap(1:end-1), v_fol(1:end-1), v_diff(1:end)];
 [b1,bint1,r1,rint1,stats1] = regress(a_fol(1:end),X);
 
+delay = 13;
+
+X=[ones(22634-delay,1),gap(1:end-1-delay), v_fol(1:end-1-delay), v_diff(1:end-delay)];
+[b1,bint1,r1,rint1,stats1] = regress(a_fol(1+delay:end),X);
+
 
 % d_new_a = 0;
 v_new_a = v_fol(1);
@@ -52,6 +57,7 @@ D_new_a = [];
 V_new_a = [];
 A_new_a = [];
 gap_new_a = gap(1);
+
 
 for time_i = 1:22634
     a_new_a = b1(1) + b1(2)*(gap_new_a) + b1(3)*v_new_a + b1(4)*(v_pre(time_i) - v_new_a);
@@ -63,14 +69,14 @@ for time_i = 1:22634
     A_new_a = [A_new_a;a_new_a];
     
 end
-
-plot(0.1:0.1:2263.4,V_new_a*m2ft,0.1:0.1:2263.4,v_fol(1:end-1)*m2ft);
-legend('Simu-SV','Real-SV');
+plot(0.1:0.1:2263.4,V_new_a*m2ft);
+plot(0.1:0.1:2263.4,v_fol(1:end-1)*m2ft,0.1:0.1:2263.4,V_new_a*m2ft);
+legend('Real-SV','Simu-SV','Simu2-SV','Simu3-SV');
 xlabel('Time(sec)');
 ylabel('Velocity(ft/sec)');
 
-path_1=['C:\Users\Ke\Box\Project\AMS\Figure\lin-model-sv-velocity.fig'];
-path_2=['C:\Users\Ke\Box\Project\AMS\Figure\lin-model-sv-velocity.pdf'];
+path_1=['C:\Users\Ke\Box\Project\AMS\Figure\models-sv-velocity.fig'];
+path_2=['C:\Users\Ke\Box\Project\AMS\Figure\models-sv-velocity.pdf'];
 saveas(gcf,path_1);
 saveas(gcf,path_2);
 rsquare(v_fol(1:end-1),V_new_a);
@@ -103,7 +109,7 @@ end
 rsquare(v_fol(1:end-1),V_new_I);
 rsquare(a_fol,A_new_I);
 
-plot(0.1:0.1:2263.4,V_new_I*m2ft,0.1:0.1:2263.4,v_fol(1:end-1)*m2ft);
+plot(0.1:0.1:2263.4,V_new_I*m2ft);
 legend('Simu-SV','Real-SV');
 xlabel('Time(sec)');
 ylabel('Velocity(ft/sec)');
