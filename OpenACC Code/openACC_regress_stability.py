@@ -119,7 +119,7 @@ def calculate_string_stability_with_delay(regression_results_delay):
     string_stability_result1 = {}
     string_stability_result2 = {}
     for i in range(2, 6):
-        f_d, f_delta_v, f_v = regression_results[f'AV{i}']['Coefficients']
+        f_d, f_delta_v, f_v = regression_results_delay[f'AV{i}']['Coefficients']
         string_stability1 =  f_v ** 2 - 2*f_d - 2*f_v*f_delta_v
         string_stability2 = 1 + 2*tau*(f_v-f_delta_v) + tau** 2*f_d
         string_stability_results1[f'AV{i}'] = string_stability1
