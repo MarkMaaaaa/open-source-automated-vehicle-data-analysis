@@ -288,7 +288,7 @@ class analysis():
                 # Current speed and position
                 current_speed = speeds[i, t-1]
                 current_position = positions[i, t-1]
-                if t-1-delay <= 0:
+                if t-1- delay <= 0:
                     current_speed_delay = historic_speeds[i, t-1-delay]
                     current_position_delay = historic_positions[i, t-1-delay]
                 else:
